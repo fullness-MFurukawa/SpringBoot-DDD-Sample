@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * ProductエンティティとProductDTOの相互変換Adapterテストドライバ
  */
+@Deprecated(since = "2025-10-26", forRemoval = true)
 @SpringBootTest
 public class ProductAdapterTest {
 

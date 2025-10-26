@@ -2,7 +2,10 @@ package com.example.ddd_demo.domain.adapter;
 
 /**
  * 任意のドメインエンティティと任意のDTOなどを相互変換するAdapterインターフェイス
+ * <p>⚠️ MapStructを導入したため、このインターフェイスは使用しません。</p>
+ * <p>今後は {@code @Mapper} を付与したMapStructインターフェイスを利用してください。</p>
  */
+@Deprecated(since = "2025-10-26", forRemoval = true)
 public interface DomainBiAdapter<DTO , DOMAIN> {
     /**
      * 任意のDTOなどを任意のドメインエンティティに再構築する

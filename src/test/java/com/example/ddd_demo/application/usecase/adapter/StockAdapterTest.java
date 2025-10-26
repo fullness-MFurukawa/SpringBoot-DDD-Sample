@@ -18,6 +18,7 @@ import com.example.ddd_demo.domain.models.stock.StockQuantity;
 /**
  * StockエンティティとStockDTOの相互変換Adapterのテストドライバ
  */
+@Deprecated(since = "2025-10-26", forRemoval = true)
 @SpringBootTest
 public class StockAdapterTest {
     @Autowired

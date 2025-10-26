@@ -15,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * ProductエンティティとProductDTOの相互変換Adapter
+ * <p>⚠️ MapStruct版 {@code ProductRecordMapper} を導入したため、このクラスは非推奨です。</p>
+ * <p>将来的には削除予定です。</p>
  */
+@Deprecated(since = "2025-10-26", forRemoval = true)
 @Component
 @RequiredArgsConstructor
 public class ProductAdapter implements DomainBiAdapter<ProductDTO, Product>{

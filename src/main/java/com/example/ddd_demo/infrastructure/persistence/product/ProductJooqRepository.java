@@ -8,7 +8,6 @@ import org.jooq.Record6;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Repository;
 
-import com.example.ddd_demo.domain.adapter.ToDomainAdapter;
 import com.example.ddd_demo.domain.exception.DomainException;
 import com.example.ddd_demo.domain.models.product.Product;
 import com.example.ddd_demo.domain.models.product.ProductId;
@@ -34,9 +33,9 @@ public class ProductJooqRepository implements ProductRepository{
     private final DSLContext dsl;
 
     /**
-     * jOOQのRecordからProductエンティティを再構築するAdapter
+     * Record6 -> Product の変換（MapStruct生成Bean）
      */
-    private final ToDomainAdapter<Record6<UUID, String, Integer, UUID, Integer, UUID>, Product> adapter;
+    private final ProductRecordMapper mapper;
 
     /**
      * 新しい商品を永続化する
@@ -130,7 +129,7 @@ public class ProductJooqRepository implements ProductRepository{
             .where(ProductTable.PRODUCT.PRODUCT_UUID.eq(uuid))
             .fetchOne();
             // 該当なし → Optional.empty()
-            return Optional.ofNullable(rec).map(adapter::toDomain);
+            return Optional.ofNullable(rec).map(mapper::toDomain);
         }catch (DataAccessException ex) {
             throw new InternalException("商品情報の取得中にデータベースエラーが発生しました。", ex);
         } catch (Exception ex) {
@@ -167,7 +166,7 @@ public class ProductJooqRepository implements ProductRepository{
             .where(ProductTable.PRODUCT.NAME.eq(productName.value()))
             .fetchOne();
              // 該当なし → Optional.empty()
-            return Optional.ofNullable(rec).map(adapter::toDomain);
+            return Optional.ofNullable(rec).map(mapper::toDomain);
         }catch (DataAccessException ex) {
             throw new InternalException("商品名による検索中にデータベースエラーが発生しました。", ex);
         } catch (Exception ex) {

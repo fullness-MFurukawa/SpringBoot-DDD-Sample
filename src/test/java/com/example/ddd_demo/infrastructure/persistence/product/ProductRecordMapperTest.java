@@ -1,7 +1,6 @@
 package com.example.ddd_demo.infrastructure.persistence.product;
 
 import static org.assertj.core.api.Assertions.*;
-
 import java.util.UUID;
 
 import org.jooq.DSLContext;
@@ -19,37 +18,33 @@ import com.example.ddd_demo.domain.models.product.Product;
 import com.example.ddd_demo.domain.models.stock.StockQuantity;
 
 /**
- * jOOQのRecordからProductエンティティを再構築するAdapterクラスの単体テストドライバ
+ * jOOQのRecordからProductエンティティを再構築する
+ * MapStruct版のProductRecordMapperの単体テストドライバ
  */
-@Deprecated(since = "2025-10-26", forRemoval = true)
 @SpringBootTest
-public class ProductRecordAdapterTest {
-
+public class ProductRecordMapperTest {
     @Autowired
     private DSLContext dsl;
-    /**
-     * テストターゲット
-     */
+
+    /** テスト対象(MapStructの生成bean) */
     @Autowired
-    private ProductRecordAdapter adapter;
-    
-    /**
-     * テスト用のRecord6を生成するヘルパーメソッド
-     */
+    private ProductRecordMapper mapper;
+
+    /** テスト用のRecord6を生成するヘルパー */
     private Record6<UUID, String, Integer, UUID, Integer, UUID> createRecord(
-            UUID productUuid, 
-            String name, 
-            Integer price, 
-            UUID stockUuid, 
-            Integer qty, 
+            UUID productUuid,
+            String name,
+            Integer price,
+            UUID stockUuid,
+            Integer qty,
             UUID categoryUuid) {
 
         return dsl.select(
-                    DSL.val(productUuid, SQLDataType.UUID),
-                    DSL.val(name,        SQLDataType.VARCHAR.length(30)),
-                    DSL.val(price,       SQLDataType.INTEGER),
-                    DSL.val(stockUuid,   SQLDataType.UUID),
-                    DSL.val(qty,         SQLDataType.INTEGER),
+                    DSL.val(productUuid,  SQLDataType.UUID),
+                    DSL.val(name,         SQLDataType.VARCHAR.length(30)),
+                    DSL.val(price,        SQLDataType.INTEGER),
+                    DSL.val(stockUuid,    SQLDataType.UUID),
+                    DSL.val(qty,          SQLDataType.INTEGER),
                     DSL.val(categoryUuid, SQLDataType.UUID)
                )
                .fetchOne(); // Record6<UUID,String,Integer,UUID,Integer,UUID>
@@ -60,14 +55,14 @@ public class ProductRecordAdapterTest {
         @Test
         @DisplayName("Record6からProductエンティティを正しく再構築できる")
         void toDomain_success() {
-            UUID productUuid = UUID.fromString("aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb");
-            UUID stockUuid   = UUID.fromString("22222222-2222-2222-2222-222222222222");
-            UUID categoryUuid   = UUID.fromString("22222222-2222-2222-2222-222222222222");
+            UUID productUuid  = UUID.fromString("aaaaaaaa-1111-2222-3333-bbbbbbbbbbbb");
+            UUID stockUuid    = UUID.fromString("22222222-2222-2222-2222-222222222222");
+            UUID categoryUuid = UUID.fromString("22222222-2222-2222-2222-222222222222");
 
             Record6<UUID,String,Integer,UUID,Integer,UUID> record =
                 createRecord(productUuid, "えんぴつ", 120, stockUuid, 10, categoryUuid);
 
-            Product product = adapter.toDomain(record);
+            Product product = mapper.toDomain(record);
 
             assertThat(product.getProductId().value()).isEqualTo(productUuid.toString());
             assertThat(product.getName().value()).isEqualTo("えんぴつ");
@@ -86,7 +81,7 @@ public class ProductRecordAdapterTest {
             Record6<UUID,String,Integer,UUID,Integer,UUID> record =
                 createRecord(UUID.randomUUID(), "   ", 120, UUID.randomUUID(), 10, UUID.randomUUID());
 
-            assertThatThrownBy(() -> adapter.toDomain(record))
+            assertThatThrownBy(() -> mapper.toDomain(record))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("商品名");
         }
@@ -97,7 +92,7 @@ public class ProductRecordAdapterTest {
             Record6<UUID,String,Integer,UUID,Integer,UUID> record =
                 createRecord(UUID.randomUUID(), "消しゴム", 49, UUID.randomUUID(), 10, UUID.randomUUID());
 
-            assertThatThrownBy(() -> adapter.toDomain(record))
+            assertThatThrownBy(() -> mapper.toDomain(record))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("商品単価は");
         }
@@ -108,7 +103,7 @@ public class ProductRecordAdapterTest {
             Record6<UUID,String,Integer,UUID,Integer,UUID> record =
                 createRecord(UUID.randomUUID(), "定規", 200, UUID.randomUUID(), 101, UUID.randomUUID());
 
-            assertThatThrownBy(() -> adapter.toDomain(record))
+            assertThatThrownBy(() -> mapper.toDomain(record))
                 .isInstanceOf(DomainException.class)
                 .hasMessageContaining("在庫数は");
         }
@@ -116,7 +111,7 @@ public class ProductRecordAdapterTest {
         @Test
         @DisplayName("変換対象がnullの場合はDomainExceptionをスローする")
         void null_record() {
-            assertThatThrownBy(() -> adapter.toDomain(null))
+            assertThatThrownBy(() -> mapper.toDomain(null))
                 .isInstanceOfAny(DomainException.class);
         }
     }
