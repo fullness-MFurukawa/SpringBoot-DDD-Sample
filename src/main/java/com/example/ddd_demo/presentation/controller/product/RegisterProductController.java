@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.ddd_demo.application.usecase.dto.CategoryDTO;
 import com.example.ddd_demo.application.usecase.dto.ProductDTO;
-import com.example.ddd_demo.application.usecase.dto.StockDTO;
 import com.example.ddd_demo.application.usecase.product.RegisterProductUsecase;
-import com.example.ddd_demo.presentation.request.ProductCreateRequest;
+import com.example.ddd_demo.presentation.schema.ProductCreateSchema;
+import com.example.ddd_demo.presentation.schema.ProductCreateSchemaMapper;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,6 +43,8 @@ public class RegisterProductController {
      * ユースケース:[商品を登録する]を実現するインターフェイス
      */
     private final RegisterProductUsecase usecase;
+
+    private final ProductCreateSchemaMapper mapper;
    
     /**
      * 商品カテゴリ一覧を提供する
@@ -110,7 +112,7 @@ public class RegisterProductController {
             required = true,
             content = @Content(
                 mediaType = "application/json",
-                schema = @Schema(implementation = ProductCreateRequest.class)
+                schema = @Schema(implementation = ProductCreateSchema.class)
             )
         )
     )
@@ -124,8 +126,9 @@ public class RegisterProductController {
         @ApiResponse(responseCode = "500", description = "サーバ内部エラー")
     })
     @PostMapping(consumes="application/json", produces="application/json")
-    public ResponseEntity<ProductDTO> register(@Valid @RequestBody ProductCreateRequest req) {
+    public ResponseEntity<ProductDTO> register(@Valid @RequestBody ProductCreateSchema req) {
         // UsecaseはProductDTO を受け取る想定なので組み立てる
+        /* 
         var dto = new ProductDTO(
             null,       // 商品Id
             req.name(),    // 商品名
@@ -133,7 +136,11 @@ public class RegisterProductController {
             new CategoryDTO(req.categoryId(), null), // 商品カテゴリ
             new StockDTO(null, req.stockQuantity())    // 商品在庫
         );
-        
+        */
+
+        // ProductCreateSchemaからProductDTOに変換する
+        var dto = mapper.toDto(req);
+
         // 事前チェック:同一商品名の有無
         usecase.existsProduct(req.name());
         // 商品の登録

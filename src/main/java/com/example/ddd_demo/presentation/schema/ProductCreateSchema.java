@@ -1,18 +1,14 @@
-package com.example.ddd_demo.presentation.request;
-
+package com.example.ddd_demo.presentation.schema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-
 /**
- * 商品登録用リクエスト受信用DTO
- * 名称は変更になるので、非推奨
+ * 商品登録用リクエスト受信用Schema(DTO)
  */
-@Deprecated(since = "2025-10-26", forRemoval = true)
 @Schema(name = "ProductCreateRequest", description = "商品登録リクエスト")
-public record ProductCreateRequest(
+public record ProductCreateSchema(
     @Schema(description = "商品名", example = "筆ペン", requiredMode = Schema.RequiredMode.REQUIRED)
     @NotBlank(message = "商品名は必須です")
     String name,
@@ -33,3 +29,4 @@ public record ProductCreateRequest(
     @Max(value = 100, message = "在庫数は100以下で指定してください")
     Integer stockQuantity
 ){}
+

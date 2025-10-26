@@ -5,6 +5,7 @@ import org.jooq.Record6;
 import org.mapstruct.Mapper;
 
 import com.example.ddd_demo.domain.exception.DomainException;
+import com.example.ddd_demo.domain.mapper.ToDomainMapper;
 import com.example.ddd_demo.domain.models.category.CategoryId;
 import com.example.ddd_demo.domain.models.product.Product;
 import com.example.ddd_demo.domain.models.product.ProductId;
@@ -18,7 +19,8 @@ import com.example.ddd_demo.domain.models.stock.StockQuantity;
  * jOOQのRecordからProductエンティティを再構築するMapperクラス
  */
 @Mapper(componentModel = "spring") // Spring管理Beanとして実装を生成する
-public interface ProductRecordMapper {
+public interface ProductRecordMapper 
+extends ToDomainMapper<Record6<UUID, String, Integer, UUID, Integer, UUID>, Product> {
     /**
      * jOOQのRecordからProductエンティティを再構築する
      * @param input jOOQのRecord

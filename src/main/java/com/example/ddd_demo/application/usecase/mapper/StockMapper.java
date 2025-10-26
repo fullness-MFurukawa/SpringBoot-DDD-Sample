@@ -5,6 +5,7 @@ import org.springframework.util.StringUtils;
 
 import com.example.ddd_demo.application.exception.InvalidInputException;
 import com.example.ddd_demo.application.usecase.dto.StockDTO;
+import com.example.ddd_demo.domain.mapper.DomainBiMapper;
 import com.example.ddd_demo.domain.models.stock.Stock;
 import com.example.ddd_demo.domain.models.stock.StockId;
 import com.example.ddd_demo.domain.models.stock.StockQuantity;
@@ -14,7 +15,7 @@ import com.example.ddd_demo.domain.models.stock.StockQuantity;
  */
 
 @Mapper(componentModel = "spring")
-public interface StockMapper {
+public interface StockMapper extends DomainBiMapper<StockDTO, Stock>{
 
     /**
      * StockDTOからStockエンティティを再構築する
@@ -38,7 +39,7 @@ public interface StockMapper {
      * @param domain Stock
      * @return StockDTO
      */
-    default StockDTO toDto(Stock domain) {
+    default StockDTO fromDomain(Stock domain) {
         if (domain == null) throw new InvalidInputException("Stockがnullです。");
         return new StockDTO(domain.getStockId().value(), domain.getQuantity().value());
     }
