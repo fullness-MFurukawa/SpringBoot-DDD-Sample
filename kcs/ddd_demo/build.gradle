@@ -1,0 +1,121 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.10'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'nu.studer.jooq' version '9.0' 
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Swagger
+    // https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui
+    implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.8.12'
+
+    // MapStruct
+    implementation 'org.mapstruct:mapstruct:1.6.2'
+    annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.2'
+    testAnnotationProcessor "org.mapstruct:mapstruct-processor:1.6.2"
+    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+
+    compileOnly 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	runtimeOnly 'org.postgresql:postgresql:42.7.3'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	testImplementation "org.junit.jupiter:junit-jupiter:5.11.3"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:5.11.3"
+
+	jooqGenerator 'org.postgresql:postgresql:42.7.3'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// jOOQで利用するschema生成
+jooq {
+	version = '3.19.26' // jOOQの利用バージョン
+	 configurations {
+        main {
+            generateSchemaSourceOnCompilation = true
+            generationTool {
+                jdbc {
+                    // ★ PostgreSQL用に変更
+                    driver = 'org.postgresql.Driver'
+                    url = 'jdbc:postgresql://localhost:5432/restapi-exercise	'
+                    user = 'postgres'
+                    password = 'postgres'
+                }
+                generator {
+                    database {
+                        // ★ PostgreSQL用メタデータリーダー
+                        name = 'org.jooq.meta.postgres.PostgresDatabase'
+                        // ★ スキーマ名（例：public）
+                        inputSchema = 'public'
+                    }
+                    target {
+                        // ★ 生成コードをDDDのInfrastructure層に配置
+                        packageName = 'com.example.ddd_demo.infrastructure.persistence.schema'
+                        directory = 'build/generated/sources/jooq/main'
+                    }
+                    strategy {
+                        matchers {
+                            tables {
+                                // product_category → ProductCategoryTable
+                                table {
+                                    expression = 'public\\.product_category'
+                                    tableClass {
+                                        transform  = 'AS_IS'                 
+                                        expression = 'ProductCategoryTable'  
+                                    }
+                                }
+                                // product → ProductTable
+                                table {
+                                    expression = 'public\\.product'
+                                    tableClass {
+                                        transform  = 'AS_IS'
+                                        expression = 'ProductTable'
+                                    }
+                                }
+                                // product_stock → ProductStockTable
+                                table {
+                                    expression = 'public\\.product_stock'
+                                    tableClass {
+                                        transform  = 'AS_IS'
+                                        expression = 'ProductStockTable'
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
